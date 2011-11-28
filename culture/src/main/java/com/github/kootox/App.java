@@ -8,7 +8,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Nantes Metropole Culture sites importer
@@ -16,12 +20,16 @@ import java.util.List;
  */
 public class App
 {
+    //Sites gathered by city for exports
+    Map<String,CultureSite> sitesPerCity = new HashMap<String,CultureSite>();
+
+
     public static void main( String[] args ) throws IOException {
         //************************* IMPORT DATA ***************************
         String input = args[0];
         File inputFile = new File(input);
         FileInputStream inputStream = new FileInputStream(inputFile);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,"ISO-8859-1"));
 
         String strLine;
 
@@ -36,6 +44,23 @@ public class App
             //split columns
             String[] items = strLine.split(";");
 
+            //split number and street
+            String addressRegexp = "([0-9]*)\\s[^\\d]+";
+            Pattern p = Pattern.compile(addressRegexp);
+            String address = "";
+            String number = "";
+            String fullAddress = items[10];
+            if (!"".equals(fullAddress)) {
+                Matcher m = p.matcher(fullAddress);
+                if (m.matches()) {
+                    address = fullAddress.substring(fullAddress.indexOf(" ")+1);
+                    number = fullAddress.substring(0, fullAddress.indexOf(" "));
+                } else {
+                    address = fullAddress;
+                }
+            }
+
+
             //import site
             CultureSite site = new CultureSite();
             site.setObjId(intValue(items[0]));
@@ -46,7 +71,8 @@ public class App
             site.setLib_type(items[7]);
             site.setStatus(items[8]);
             site.setCity(items[9]);
-            site.setAddress(items[10]);
+            site.setStreet(address);
+            site.setNumber(number);
             site.setPhone(items[11]);
             site.setWeb(items[12]);
             site.setPostalCode(intValue(items[13]));
@@ -91,12 +117,23 @@ public class App
             id++;
 
             //tag values
-            appendTagValue(builder,"source","Nantes Métropole 11/2011");
-            appendTagValue(builder,"name",site.getName());
-            appendTagValue(builder,"addr:city", site.getCity());
-            appendTagValue(builder,"addr:street", site.getAddress());
-            appendTagValue(builder,"addr:postCode", site.getPostalCode());
-            appendTagValue(builder,"contact:phone", site.getPhone());
+            appendTagValue(builder, "source","Nantes Métropole 11/2011");
+            appendTagValue(builder, "name",site.getName());
+            if (!"".equals(site.getCity())){
+                appendTagValue(builder, "addr:city", site.getCity());
+            }
+            if (!"".equals(site.getStreet())){
+                appendTagValue(builder, "addr:street", site.getStreet());
+            }
+            if (!"".equals(site.getNumber())){
+                appendTagValue(builder, "addr:number", site.getNumber());
+            }
+            if (!(site.getPostalCode() == 0)){
+                appendTagValue(builder, "addr:postcode", site.getPostalCode());
+            }
+            if (!"".equals(site.getPhone())){
+                appendTagValue(builder, "contact:phone", site.getPhone());
+            }
 
             //type tag value
             if (site.getCategory() == 106) {

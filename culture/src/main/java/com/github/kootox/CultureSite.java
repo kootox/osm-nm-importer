@@ -10,11 +10,13 @@ public class CultureSite {
     String lib_type;
     String status;
     String city;
-    String address;
+    String street;
+    String number;
     String phone;
     String web;
     int postalCode;
     double latitude;
+    double longitude;
 
     public int getObjId() {
         return objId;
@@ -64,12 +66,12 @@ public class CultureSite {
         this.phone = phone;
     }
 
-    public String getAddress() {
-        return address;
+    public String getStreet() {
+        return street;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setStreet(String street) {
+        this.street = street;
     }
 
     public String getStatus() {
@@ -128,5 +130,11 @@ public class CultureSite {
         this.name = name;
     }
 
-    double longitude;
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
 }
