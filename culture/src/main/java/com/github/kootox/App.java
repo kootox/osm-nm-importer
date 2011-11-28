@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class App
 {
     //Sites gathered by city for exports
-    Map<String,CultureSite> sitesPerCity = new HashMap<String,CultureSite>();
+    static Map<String,List<CultureSite>> sitesPerCity = new HashMap<String,List<CultureSite>>();
 
 
     public static void main( String[] args ) throws IOException {
@@ -35,8 +35,6 @@ public class App
 
         //Read header
         strLine = reader.readLine();
-
-        List<CultureSite> sites = new ArrayList<CultureSite>();
 
         //Read File Line By Line
         while ((strLine = reader.readLine()) != null)   {
@@ -80,7 +78,14 @@ public class App
             site.setLatitude(doubleValue(items[15]));
 
             //Add site to list
-            sites.add(site);
+            if (sitesPerCity.containsKey(items[9])){
+                List<CultureSite> sites = sitesPerCity.get(items[9]);
+                sites.add(site);
+            } else {
+                List<CultureSite> sites = new ArrayList<CultureSite>();
+                sites.add(site);
+                sitesPerCity.put(items[9], sites);
+            }
         }
         //Close the input stream
         inputStream.close();
@@ -88,8 +93,10 @@ public class App
 
         //************************* EXPORT TO OSM *************************
 
+        for(Map.Entry<String, List<CultureSite>> entry : sitesPerCity.entrySet()){
+
         // Create file
-        String output = args[1];
+        String output = entry.getKey()+".osm";
         FileWriter fstream = new FileWriter(output);
         BufferedWriter out = new BufferedWriter(fstream);
 
@@ -99,7 +106,7 @@ public class App
 
         int id = 1;
 
-        for (CultureSite site :sites) {
+        for (CultureSite site :entry.getValue()) {
             //node info
             builder.append("  <node ");
             builder.append("lat = \"")
@@ -186,6 +193,7 @@ public class App
         
         //Close the output stream
         out.close();
+            }
     }
 
     /**
