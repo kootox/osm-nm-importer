@@ -96,7 +96,12 @@ public class App
         for(Map.Entry<String, List<CultureSite>> entry : sitesPerCity.entrySet()){
 
         // Create file
-        String output = entry.getKey()+".osm";
+        String output = entry.getKey();
+        if (!"".equals(output)){
+            output = output +".osm";
+        } else {
+            output="noCity.osm";
+        }
         FileWriter fstream = new FileWriter(output);
         BufferedWriter out = new BufferedWriter(fstream);
 
@@ -126,6 +131,7 @@ public class App
             //tag values
             appendTagValue(builder, "source","Nantes Métropole 11/2011");
             appendTagValue(builder, "name",site.getName());
+            appendTagValue(builder, "ref:FR:NantesMetropole", site.getObjId());
             if (!"".equals(site.getCity())){
                 appendTagValue(builder, "addr:city", site.getCity());
             }
