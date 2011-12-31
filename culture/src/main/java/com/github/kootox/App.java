@@ -1,5 +1,7 @@
 package com.github.kootox;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -133,7 +135,8 @@ public class App
             appendTagValue(builder, "name",site.getName());
             appendTagValue(builder, "ref:FR:NantesMetropole", site.getObjId());
             if (!"".equals(site.getCity())){
-                appendTagValue(builder, "addr:city", site.getCity());
+                String lowerCaseCity = site.getCity().toLowerCase();
+                appendTagValue(builder, "addr:city", StringUtils.capitalize(lowerCaseCity));
             }
             if (!"".equals(site.getStreet())){
                 appendTagValue(builder, "addr:street", site.getStreet());
